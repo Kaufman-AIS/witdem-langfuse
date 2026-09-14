@@ -1,5 +1,7 @@
 # Witdem for Langfuse
 
+[![CI](https://github.com/Kaufman-AIS/witdem-langfuse/actions/workflows/ci.yml/badge.svg)](https://github.com/Kaufman-AIS/witdem-langfuse/actions/workflows/ci.yml)
+
 [Website](https://witdem.com/en) · [Witdem documentation](https://docs.witdem.com/) · [Witdem OSS](https://github.com/ebrahimisoheil/witdem-oss) · [Integration guide](docs/README.md) · [Run the example](examples/cuad-evaluations/README.md)
 
 Understand whether an AI execution met your declared requirements, using the evaluations you already store in Langfuse.

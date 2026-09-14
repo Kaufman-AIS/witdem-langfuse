@@ -1,0 +1,66 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    name: Python checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          python-version: '3.12'
+      - name: Install with deployment constraints
+        run: |
+          uv venv .venv --python 3.12
+          uv pip install --python .venv/bin/python -c deploy/requirements.lock -e '.[etl,telemetry,contracts,dev]'
+      - name: Check lockfile consistency
+        run: |
+          uv pip compile pyproject.toml --extra=etl --extra=telemetry --extra=contracts --output-file=deploy/requirements.lock --quiet
+          git diff --exit-code -- deploy/requirements.lock
+      - name: Lint and format
+        run: |
+          .venv/bin/ruff check src tests benchmarks
+          .venv/bin/ruff format --check src tests benchmarks
+      - name: Run tests with Duckle
+        run: DUCKLE_EXECUTABLE="$PWD/.venv/bin/duckle" .venv/bin/python -m unittest discover -s tests -q
+
+  container:
+    name: Container recovery
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@bec219d24cd3e171d82865faccec33120bb574f4 # v10.1.0
+        with:
+          python-version: '3.12'
+      - name: Install benchmark harness
+        run: |
+          uv venv .venv --python 3.12
+          uv pip install --python .venv/bin/python -r deploy/requirements.lock -e .
+      - name: Build Linux worker
+        run: docker build -f deploy/Dockerfile -t witdem-langfuse-worker:ci .
+      - name: Verify retries, restart, and stable identities
+        run: .venv/bin/python benchmarks/run.py --image witdem-langfuse-worker:ci --output output/ci-recovery --sizes 1000 --faults --interrupt
+      - name: Show worker diagnostics
+        if: failure()
+        run: |
+          docker ps -a --filter name=witdem-benchmark
+          for container in $(docker ps -aq --filter name=witdem-benchmark); do docker logs --tail 100 "$container"; done
