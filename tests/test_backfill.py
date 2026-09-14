@@ -11,6 +11,7 @@ from witdem_langfuse.backfill import (
     Backfill,
     duckle_encode,
     encode,
+    model_context,
     retry_delay,
     token_usage,
 )
@@ -33,6 +34,42 @@ ROW = {
 
 
 class BackfillTest(unittest.TestCase):
+    def test_model_cost_context_preserves_reported_facts(self):
+        row = dict(
+            ROW,
+            metadata={
+                "attributes.gen_ai.provider.name": "deepseek",
+                "attributes.gen_ai.cost.usd": 0.004,
+                "attributes.gen_ai.cost.source": "litellm_reported",
+                "private": "must not export",
+            },
+            costDetails={"total": 0.9},
+        )
+        payload = ExportTraceServiceRequest.FromString(encode([row], "p"))
+        attrs = {
+            a.key: a.value
+            for a in payload.resource_spans[0].scope_spans[0].spans[0].attributes
+        }
+        self.assertEqual(attrs["gen_ai.provider.name"].string_value, "deepseek")
+        self.assertEqual(attrs["gen_ai.cost.usd"].double_value, 0.004)
+        self.assertEqual(attrs["gen_ai.cost.source"].string_value, "litellm_reported")
+        self.assertNotIn("private", attrs)
+        context = model_context(dict(row, type="SPAN"))
+        self.assertEqual(context["gen_ai.provider.name"], "deepseek")
+        self.assertNotIn("gen_ai.cost.usd", context)
+
+    def test_missing_cost_is_not_zero_or_inferred(self):
+        self.assertEqual(model_context(dict(ROW, totalCost=0, costDetails={})), {})
+        for cost in (None, True, -1, float("nan"), float("inf"), "0.4"):
+            self.assertNotIn(
+                "gen_ai.cost.usd", model_context(dict(ROW, costDetails={"total": cost}))
+            )
+        for cost in (0, 0.04):
+            result = model_context(dict(ROW, costDetails={"total": cost}))
+            self.assertEqual(result["gen_ai.cost.usd"], cost)
+            self.assertEqual(result["gen_ai.cost.source"], "langfuse_cost_details")
+            self.assertNotIn("gen_ai.provider.name", result)
+
     def test_usage_units_and_exclusive_cache_buckets(self):
         self.assertEqual(
             token_usage(

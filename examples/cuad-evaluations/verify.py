@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import math
 import time
 from pathlib import Path
 
@@ -15,6 +16,11 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument("--output", type=Path, required=True)
     p.add_argument("--dashboard", required=True)
+    p.add_argument(
+        "--live-only",
+        action="store_true",
+        help="verify a fresh live import without synthetic fixtures",
+    )
     a = p.parse_args()
     recording = [
         json.dumps(
@@ -36,7 +42,7 @@ def main():
         at += 2
 
     checks = {}
-    for label in ["live", "failed", "missing"]:
+    for label in ["live"] if a.live_only else ["live", "failed", "missing"]:
         root = a.output / label
         manifest = (
             root / "assessment/assessment.jsonl"
@@ -80,8 +86,26 @@ def main():
             reference = root / "original-summary.json"
             if reference.exists():
                 original = json.loads(reference.read_text())
-                for field in ("model_calls", "total_tokens"):
-                    assert summary[field] == original[field]
+                for field in (
+                    "model_calls",
+                    "input_tokens",
+                    "output_tokens",
+                    "total_tokens",
+                    "providers",
+                    "models",
+                ):
+                    assert summary[field] == original[field], (
+                        f"Imported {field} differs from source"
+                    )
+                for field in ("measured_cost", "cost_coverage"):
+                    if original.get(field) is not None:
+                        assert summary.get(field) is not None and math.isclose(
+                            summary[field], original[field], rel_tol=1e-9
+                        ), f"Imported {field} differs from source"
+                say(
+                    f"Usage: {summary['model_calls']} model calls; {summary['total_tokens']} tokens; cost {summary['measured_cost']}"
+                )
+                say("Providers: " + str(summary.get("providers")))
             assert expected["trace_url"] in bundle.text
         assert detail["workflow_replay"] is not None
         say(

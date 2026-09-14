@@ -54,6 +54,20 @@ two threads, and a 256 MB Duckle memory setting. Only engineering fields are
 requested. Inputs, outputs, and arbitrary metadata are excluded from export.
 Secrets are not placed in the checkpoint or command arguments.
 
+Add `--telemetry-context` to fetch observation metadata for explicit provider,
+request-model, and reported-cost attributes. Only these recognized scalar fields
+(and the existing workflow identifiers) are exported; arbitrary metadata is not.
+Provider names are never guessed from model names. Original `gen_ai.cost.usd`
+telemetry and its source take precedence over Langfuse `costDetails.total`.
+Langfuse-calculated costs retain the `langfuse_cost_details` source label; a
+missing cost stays unknown, including when an aggregate total defaults to zero.
+See the [Langfuse API field groups](https://langfuse.com/docs/api-and-data-platform/features/observations-api).
+
+Normalization version 3 adds this cost/provider projection. Use a fresh checkpoint
+when upgrading from version 2; existing checkpoints reject changed normalization.
+Imported trace/span identities remain stable. Re-importing the same interval
+updates the same executions rather than creating another set of runs.
+
 Current scope: one operator-controlled local backfill. Source/receiver HTTP 429,
 5xx, and transport failures preserve progress and save a durable retry deadline.
 Numeric and HTTP-date Retry-After values are honored; otherwise exponential
