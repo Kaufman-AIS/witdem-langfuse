@@ -56,7 +56,7 @@ From the repository root, the lock can be regenerated with:
 ```sh
 uv pip compile pyproject.toml --extra=etl --extra=telemetry --extra=contracts --output-file=deploy/requirements.lock
 uv pip install --python .venv/bin/python -e '.[etl,telemetry,contracts,dev]'
-DUCKLE_EXECUTABLE="$PWD/.venv/bin/duckle" .venv/bin/python -m unittest discover -s tests -q
+.venv/bin/python -m unittest discover -s tests -q
 docker build -f deploy/Dockerfile -t witdem-langfuse-worker:dependency-check .
 ```
 

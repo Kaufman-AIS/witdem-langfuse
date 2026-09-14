@@ -54,7 +54,6 @@ Create a UTF-8 JSONL manifest with one replay envelope per line (the envelope
 itself, without the `page_json` wrapper). The command wraps each page for Duckle:
 
 ```sh
-export DUCKLE_EXECUTABLE="$PWD/.venv/bin/duckle"
 .venv/bin/python -m witdem_langfuse.replay_delivery \
   --manifest output/replay/manifest.jsonl \
   --checkpoint output/replay/delivery.sqlite \

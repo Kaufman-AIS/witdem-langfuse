@@ -115,7 +115,6 @@ git clone https://github.com/Kaufman-AIS/witdem-langfuse.git
 cd witdem-langfuse
 uv venv .venv --python 3.12
 uv pip install --python .venv/bin/python -e '.[etl,telemetry,contracts,dev]'
-export DUCKLE_EXECUTABLE="$PWD/.venv/bin/duckle"
 .venv/bin/python -m unittest discover -s tests -q
 ```
 

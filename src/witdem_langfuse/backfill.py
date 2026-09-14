@@ -14,7 +14,6 @@ import hashlib
 import json
 import math
 import os
-import shutil
 import sqlite3
 import subprocess
 import sys
@@ -35,6 +34,7 @@ from opentelemetry.proto.collector.trace.v1.trace_service_pb2 import (
 from .client import Client, SourceError
 from .http_policy import request
 from .quota import SharedBudget
+from .runtime import backfill_executable
 
 NORMALIZATION_VERSION = 3
 
@@ -225,9 +225,7 @@ def process(row):
 
 
 def duckle_encode(rows, project):
-    executable = os.environ.get("DUCKLE_EXECUTABLE") or shutil.which("duckle")
-    if not executable:
-        raise RuntimeError("Duckle executable is required for backfills")
+    executable = backfill_executable()
     document = json.dumps(
         {"page_json": json.dumps({"rows": rows, "project": project}, allow_nan=False)},
         allow_nan=False,
