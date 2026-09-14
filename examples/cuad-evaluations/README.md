@@ -1,9 +1,15 @@
 # Existing evaluations → understandable business requirements
 
+[Integration home](../../README.md) · [Documentation index](../../docs/README.md) · [Witdem docs](https://docs.witdem.com/) · [Witdem OSS](https://github.com/ebrahimisoheil/witdem-oss)
+
 This example uses the existing Haystack CUAD review and existing Witdem OSS UI.
 The contract asks only whether the review meets two evidence-quality requirements.
 It does not equate approval, legal correctness, or overall business success with
 passing these evaluations.
+
+## Prerequisites
+
+New to Witdem? Follow the [official setup guide](https://docs.witdem.com/getting-started/). Read the [contract tutorial](https://docs.witdem.com/contract-tutorial/) for the schema reused here, and the [Haystack guide](https://docs.witdem.com/integrations/haystack/) for application instrumentation. This example adds a separate score-binding file to connect Langfuse evidence to those requirements.
 
 ## Run
 
