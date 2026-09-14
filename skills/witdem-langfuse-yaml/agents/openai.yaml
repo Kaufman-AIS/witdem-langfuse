@@ -1,0 +1,4 @@
+interface:
+  display_name: "Witdem YAML contracts"
+  short_description: "Map Langfuse evaluations to named YAML requirements"
+  default_prompt: "Use $witdem-langfuse-yaml to draft and validate a Witdem contract and score bindings from my existing Langfuse evaluations."

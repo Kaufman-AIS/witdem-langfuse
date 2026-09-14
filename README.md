@@ -102,6 +102,10 @@ Run a bounded historical job in a Linux container with persistent checkpoints, s
 
 [Deployment guide](docs/deployment.md) · [Measured benchmark](docs/benchmark-results.md) · [Reproduce it](benchmarks/README.md)
 
+## Author contracts with your AI assistant
+
+Use the [YAML authoring skill](docs/yaml-skill.md) to draft contracts and exact score bindings, validate them, and preview saved evaluations offline.
+
 ## Install and test
 
 Python 3.12+ and uv are required. The connected example additionally requires Langfuse and Witdem OSS; the CUAD runner requires its separately installed application and provider configuration.
