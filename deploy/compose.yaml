@@ -1,0 +1,24 @@
+name: witdem-langfuse-job
+services:
+  worker:
+    build:
+      context: ..
+      dockerfile: deploy/Dockerfile
+    image: witdem-langfuse-worker:local
+    init: true
+    restart: "no"
+    cpus: 2
+    mem_limit: 1g
+    pids_limit: 128
+    stop_grace_period: 15s
+    environment:
+      LANGFUSE_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY:?Supply Langfuse public key}
+      LANGFUSE_SECRET_KEY: ${LANGFUSE_SECRET_KEY:?Supply Langfuse secret key}
+      WITDEM_API_KEY: ${WITDEM_API_KEY:-}
+      WITDEM_REQUESTS_PER_MINUTE: ${WITDEM_REQUESTS_PER_MINUTE:-30}
+      WITDEM_HTTP_ATTEMPTS: 5
+    volumes:
+      - ./config:/config:ro
+      - state:/state
+volumes:
+  state:

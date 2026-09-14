@@ -1,0 +1,97 @@
+{
+  "kind": "synthetic-source; actual container and Duckle; SQLite identity-verifying sink",
+  "limits": {
+    "cpus": 2,
+    "memory_gib": 1,
+    "source_requests_per_minute": 60000
+  },
+  "image": "sha256:58146178659904f2a6d790169a2e4916a27647a213b6d3fc46ae8d6cf186ee51",
+  "state_storage": "Docker Desktop host bind mount",
+  "faults_triggered": [],
+  "results": [
+    {
+      "observations": 1000,
+      "source_scores": 1000,
+      "wall_seconds": 13.428,
+      "observations_per_second": 74.47,
+      "http_requests": 23,
+      "peak_memory_mib": 97.54,
+      "cpu": {
+        "usage_usec": "9111586",
+        "user_usec": "7849811",
+        "system_usec": "1261774",
+        "nr_periods": "101",
+        "nr_throttled": "0",
+        "throttled_usec": "0",
+        "nr_bursts": "0",
+        "burst_usec": "0"
+      },
+      "sink_cumulative_counts": {
+        "semantic": 7,
+        "span": 1000,
+        "writeback": 3
+      },
+      "state_bytes": 811681,
+      "oom_killed": false,
+      "completed_rerun_no_requests": true,
+      "interrupted_and_resumed": false,
+      "overlapping_job_rejected": false
+    },
+    {
+      "observations": 10000,
+      "source_scores": 10000,
+      "wall_seconds": 30.606,
+      "observations_per_second": 326.74,
+      "http_requests": 131,
+      "peak_memory_mib": 97.62,
+      "cpu": {
+        "usage_usec": "24072999",
+        "user_usec": "20615264",
+        "system_usec": "3457734",
+        "nr_periods": "275",
+        "nr_throttled": "0",
+        "throttled_usec": "0",
+        "nr_bursts": "0",
+        "burst_usec": "0"
+      },
+      "sink_cumulative_counts": {
+        "semantic": 14,
+        "span": 11000,
+        "writeback": 6
+      },
+      "state_bytes": 3515062,
+      "oom_killed": false,
+      "completed_rerun_no_requests": true,
+      "interrupted_and_resumed": false,
+      "overlapping_job_rejected": false
+    },
+    {
+      "observations": 100000,
+      "source_scores": 100000,
+      "wall_seconds": 341.941,
+      "observations_per_second": 292.45,
+      "http_requests": 1211,
+      "peak_memory_mib": 123.63,
+      "cpu": {
+        "usage_usec": "185668402",
+        "user_usec": "159708997",
+        "system_usec": "25959405",
+        "nr_periods": "2181",
+        "nr_throttled": "0",
+        "throttled_usec": "0",
+        "nr_bursts": "0",
+        "burst_usec": "0"
+      },
+      "sink_cumulative_counts": {
+        "semantic": 21,
+        "span": 111000,
+        "writeback": 9
+      },
+      "state_bytes": 30851787,
+      "oom_killed": false,
+      "completed_rerun_no_requests": true,
+      "interrupted_and_resumed": false,
+      "overlapping_job_rejected": false
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+*
+!deploy/
+!deploy/Dockerfile
+!deploy/requirements.lock
+!pyproject.toml
+!README.md
+!LICENSE
+!src/
+!src/**
+**/__pycache__/

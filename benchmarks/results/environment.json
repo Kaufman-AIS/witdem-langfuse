@@ -1,0 +1,10 @@
+{
+  "OSType": "linux",
+  "Architecture": "aarch64",
+  "NCPU": 11,
+  "MemTotal": 10419228672,
+  "KernelVersion": "6.12.5-linuxkit",
+  "ServerVersion": "27.5.1",
+  "OperatingSystem": "Docker Desktop",
+  "physical_cpu": "Apple M3 Pro"
+}

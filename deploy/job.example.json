@@ -1,0 +1,35 @@
+{
+  "version": 1,
+  "tasks": [
+    {
+      "id": "historical-observations",
+      "command": "backfill",
+      "arguments": [
+        "--source", "https://cloud.langfuse.com",
+        "--project", "YOUR_PROJECT_ID",
+        "--receiver", "https://YOUR_WITDEM_RECEIVER",
+        "--from-time", "2026-09-01T00:00:00Z",
+        "--to-time", "2026-09-02T00:00:00Z",
+        "--checkpoint", "/state/observations.sqlite",
+        "--page-size", "100",
+        "--max-pages", "10"
+      ]
+    },
+    {
+      "id": "assess-selected-execution",
+      "command": "evaluations",
+      "arguments": [
+        "--source", "https://cloud.langfuse.com",
+        "--project", "YOUR_PROJECT_ID",
+        "--trace", "YOUR_TRACE_ID",
+        "--receiver", "https://YOUR_WITDEM_RECEIVER",
+        "--from-time", "2026-09-01T00:00:00Z",
+        "--to-time", "2026-09-03T00:00:00Z",
+        "--contract", "/config/contract.yaml",
+        "--bindings", "/config/bindings.yaml",
+        "--workspace", "/state/assessment",
+        "--max-pages", "10"
+      ]
+    }
+  ]
+}

@@ -30,8 +30,9 @@ workflows, and evidence-oriented deployment gates. Our offer is a reusable YAML
 contract-to-evaluation mapping and business-readable presentation of that mapping.
 The adapter lives in a separate repository and reuses Witdem OSS unchanged.
 
-Would a community integration cookbook showing this workflow be useful? We would
-contribute the runnable CUAD recipe and document the mapping and limitations.
+I would appreciate feedback from teams reviewing executions against named
+requirements: does this mapping make the result easier to understand, and what
+evidence would you need to trust it? The runnable example is linked below.
 
 ---
 

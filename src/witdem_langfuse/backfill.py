@@ -33,6 +33,7 @@ from opentelemetry.proto.collector.trace.v1.trace_service_pb2 import (
 )
 
 from .client import Client, SourceError
+from .http_policy import request
 from .quota import SharedBudget
 
 NORMALIZATION_VERSION = 2
@@ -444,6 +445,7 @@ def main():
     parser.add_argument("--to-time", required=True)
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--max-pages", type=int, default=10)
+    parser.add_argument("--page-size", type=int, default=100)
     parser.add_argument("--allow-http", action="store_true")
     parser.add_argument(
         "--quota-db",
@@ -476,7 +478,9 @@ def main():
     with httpx.Client(timeout=30, follow_redirects=False) as http:
 
         def send(payload):
-            response = http.post(
+            response = request(
+                http,
+                "POST",
                 args.receiver.rstrip("/") + "/v1/traces",
                 content=payload,
                 headers=headers,
@@ -495,7 +499,10 @@ def main():
             args.from_time,
             args.to_time,
             send=send,
-            budget=SharedBudget(
+            page_size=args.page_size,
+            budget=None
+            if os.getenv("WITDEM_JOB_STATE")
+            else SharedBudget(
                 args.quota_db,
                 args.quota_group or source.base_url,
                 requests_per_minute=args.requests_per_minute,

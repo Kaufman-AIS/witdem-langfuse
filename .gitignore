@@ -12,3 +12,4 @@ output/
 *.sqlite
 *.duckdb
 *.cast
+deploy/config/

@@ -1,11 +1,10 @@
-"""Bounded Langfuse v2 HTTP client; durable scheduling lives in sync.py."""
+"""Bounded Langfuse public observations client."""
 
 import base64
 import json
 from datetime import datetime
-from urllib.error import HTTPError
-from urllib.parse import urlencode, urlsplit
-from urllib.request import HTTPRedirectHandler, Request, build_opener
+from urllib.parse import urlsplit
+from urllib.request import HTTPRedirectHandler
 
 
 class NoRedirect(HTTPRedirectHandler):
@@ -53,18 +52,25 @@ class Client:
         self.transport = transport or self._get
 
     def _get(self, params):
-        request = Request(
-            self.base_url + "/api/public/v2/observations?" + urlencode(params),
-            headers={"Authorization": self.auth, "Accept": "application/json"},
-        )
+        import httpx
+
+        from .http_policy import request
+
         try:
-            with build_opener(NoRedirect()).open(request, timeout=30) as response:
-                body = response.read(16 * 1024 * 1024 + 1)
-                if len(body) > 16 * 1024 * 1024:
-                    raise ValueError("response exceeds 16 MiB; lower page limit")
-                return json.loads(body)
-        except HTTPError as exc:
-            raise SourceError(exc.code, exc.headers.get("Retry-After")) from None
+            with httpx.Client(timeout=30, follow_redirects=False) as http:
+                return request(
+                    http,
+                    "GET",
+                    self.base_url + "/api/public/v2/observations",
+                    params=params,
+                    headers={"Authorization": self.auth},
+                ).json()
+        except httpx.HTTPStatusError as exc:
+            raise SourceError(
+                exc.response.status_code, exc.response.headers.get("Retry-After")
+            ) from None
+        except httpx.TransportError:
+            raise OSError("Langfuse transport failed") from None
 
     def page(
         self,
@@ -137,7 +143,7 @@ class Client:
             or not isinstance(payload.get("data"), list)
             or not isinstance(payload.get("meta"), dict)
         ):
-            raise ValueError("invalid v2 response")
+            raise ValueError("invalid v2 response")  # noqa: TRY004 - public protocol validation error
         if len(payload["data"]) > limit:
             raise ValueError("source exceeded requested row bound")
         for row in payload["data"]:

@@ -16,6 +16,7 @@ from pydantic import BaseModel, ConfigDict
 
 from .backfill import timestamp
 from .client import Client
+from .http_policy import request
 from .replay import remap
 from .replay_delivery import ReplayDelivery, canonical, duckle_page
 
@@ -69,6 +70,27 @@ def own_score(s):
     )
 
 
+def matches_binding(s, b, trace):
+    subject = s.get("subject") or {}
+    return (
+        not own_score(s)
+        and s.get("name") == b.name
+        and s.get("source") == b.source
+        and (
+            s.get("id") == b.score_id
+            if b.score_id
+            else s.get("configId") == b.config_id
+        )
+        and subject.get("kind") == b.subject
+        and (
+            subject.get("id") == trace
+            if b.subject == "trace"
+            else subject.get("traceId") == trace
+            and subject.get("id") == b.observation_id
+        )
+    )
+
+
 def assess(page):
     spec = validate(page["contract"], page["bindings"])
     project, trace = page["project_id"], page["source_trace_id"]
@@ -98,25 +120,8 @@ def assess(page):
         b = Binding.model_validate(raw)
         matches = []
         for s in rows.values():
-            subject = s.get("subject") or {}
-            if own_score(s) or s.get("name") != b.name or s.get("source") != b.source:
-                continue
-            if (
-                b.score_id
-                and s["id"] != b.score_id
-                or b.config_id
-                and s.get("configId") != b.config_id
-            ):
-                continue
-            if subject.get("kind") != b.subject:
-                continue
-            if b.subject == "trace" and subject.get("id") != trace:
-                continue
-            if b.subject == "observation" and (
-                subject.get("traceId") != trace or subject.get("id") != b.observation_id
-            ):
-                continue
-            matches.append(s)
+            if matches_binding(s, b, trace):
+                matches.append(s)
         e = spec.evaluations[b.evaluation]
         passed, reason, value = None, "missing_evaluation", None
         if len(matches) > 1:
@@ -320,7 +325,7 @@ class ScoreSnapshot:
     def __init__(self, path, config, fetch):
         self.path, self.config, self.fetch = Path(path), config, fetch
 
-    def run(self, max_pages=10):
+    def run(self, max_pages=10, *, load_scores=True):
         import fcntl
 
         self.path.parent.mkdir(parents=True, exist_ok=True)
@@ -334,6 +339,7 @@ class ScoreSnapshot:
                 db.execute(
                     "CREATE TABLE IF NOT EXISTS scores(id TEXT PRIMARY KEY, body TEXT)"
                 )
+                db.execute("CREATE TABLE IF NOT EXISTS cursors(value TEXT PRIMARY KEY)")
                 saved = db.execute("SELECT * FROM state").fetchone()
                 if not saved:
                     db.execute(
@@ -348,6 +354,11 @@ class ScoreSnapshot:
                     if complete:
                         break
                     response = self.fetch(cursor)
+                    if (
+                        not isinstance(response.get("data"), list)
+                        or len(response["data"]) > 100
+                    ):
+                        raise ValueError("score response exceeded page row limit")
                     for s in response["data"]:
                         if s.get("projectId") != self.config["project"]:
                             raise ValueError("score project mismatch")
@@ -363,17 +374,54 @@ class ScoreSnapshot:
                             "INSERT OR IGNORE INTO scores VALUES(?,?)", (s["id"], body)
                         )
                     following = response.get("meta", {}).get("cursor")
-                    if following and following == cursor:
-                        raise ValueError("score cursor did not advance")
+                    if following is not None:
+                        if (
+                            not isinstance(following, str)
+                            or not following
+                            or following == cursor
+                        ):
+                            raise ValueError("score cursor did not advance")
+                        if db.execute(
+                            "SELECT 1 FROM cursors WHERE value=?", (following,)
+                        ).fetchone():
+                            raise ValueError("score cursor cycle")
+                        db.execute("INSERT INTO cursors VALUES(?)", (following,))
                     cursor, complete = following, not following
                     db.execute(
                         "UPDATE state SET cursor=?,complete=?", (cursor, int(complete))
                     )
                     db.commit()
-                return bool(complete), [
-                    json.loads(r[0])
-                    for r in db.execute("SELECT body FROM scores ORDER BY id")
-                ]
+                count = db.execute("SELECT count(*) FROM scores").fetchone()[0]
+                if not load_scores:
+                    return bool(complete), count
+                if count > 1000:
+                    raise ValueError("use select_scores for snapshots over 1000 scores")
+                return bool(complete), self.select_scores()
+
+    def select_scores(
+        self, bindings=None, trace=None, *, max_scores=1000, max_bytes=8 * 1024 * 1024
+    ):
+        """Scan on disk, bounding retained evidence independently of snapshot size."""
+        configured = (
+            [Binding.model_validate(b) for b in bindings["requirements"].values()]
+            if bindings
+            else None
+        )
+        selected, size = [], 0
+        with sqlite3.connect(self.path) as db:
+            for (body,) in db.execute("SELECT body FROM scores ORDER BY id"):
+                score = json.loads(body)
+                if configured is not None and not any(
+                    matches_binding(score, b, trace) for b in configured
+                ):
+                    continue
+                size += len(body.encode())
+                if len(selected) >= max_scores or size > max_bytes:
+                    raise ValueError(
+                        "matching evidence exceeds assessment limit; narrow score bindings"
+                    )
+                selected.append(score)
+        return selected
 
 
 def main():
@@ -437,7 +485,9 @@ def main():
             }
             if cursor:
                 params["cursor"] = cursor
-            response = http.get(
+            response = request(
+                http,
+                "GET",
                 args.source.rstrip("/") + "/api/public/v3/scores",
                 params=params,
                 headers={"Authorization": source.auth},
@@ -447,12 +497,12 @@ def main():
                 raise ValueError("score page exceeds 16 MiB")
             return response.json()
 
-        complete, scores = ScoreSnapshot(
-            args.workspace / "scores.sqlite", config, fetch
-        ).run(args.max_pages)
+        snapshot = ScoreSnapshot(args.workspace / "scores.sqlite", config, fetch)
+        complete, score_count = snapshot.run(args.max_pages, load_scores=False)
         if not complete:
-            print(canonical({"complete": False, "scores": len(scores)}))
+            print(canonical({"complete": False, "scores": score_count}))
             return
+        scores = snapshot.select_scores(bindings, args.trace)
         page = {
             "project_id": args.project,
             "source_trace_id": args.trace,
@@ -469,7 +519,12 @@ def main():
             raise ValueError(
                 "assessment workspace is immutable; choose a new workspace"
             )
-        manifest.write_text(body)
+        temporary = manifest.with_suffix(".tmp")
+        with temporary.open("w") as stream:
+            stream.write(body)
+            stream.flush()
+            os.fsync(stream.fileno())
+        temporary.replace(manifest)
         transformed = duckle_assessment(page)
         (args.workspace / "records.json").write_text(json.dumps(transformed, indent=2))
         result = assess(page)
@@ -481,7 +536,9 @@ def main():
                 headers["Authorization"] = "Bearer " + os.environ["WITDEM_API_KEY"]
 
             def send(body):
-                response = http.post(
+                response = request(
+                    http,
+                    "POST",
                     args.receiver.rstrip("/") + "/sdk/v1/records",
                     content=body,
                     headers=headers,
@@ -500,6 +557,7 @@ def main():
         print(
             canonical(
                 {
+                    "complete": not args.receiver or result["delivery"]["complete"],
                     "achieved": result["achieved"],
                     "failed": result["failed"],
                     "unknown": result["unknown"],

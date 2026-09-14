@@ -1,0 +1,55 @@
+{
+  "kind": "synthetic-source; actual container and Duckle; SQLite identity-verifying sink",
+  "limits": {
+    "cpus": 2,
+    "memory_gib": 1,
+    "source_requests_per_minute": 60000
+  },
+  "image": "sha256:58146178659904f2a6d790169a2e4916a27647a213b6d3fc46ae8d6cf186ee51",
+  "state_storage": "Linux named volume",
+  "faults_triggered": [
+    "ack_loss",
+    "get429-observations",
+    "get429-scores",
+    "post503-records",
+    "post503-scores",
+    "post503-traces"
+  ],
+  "results": [
+    {
+      "observations": 1000,
+      "source_scores": 1000,
+      "wall_seconds": 24.199,
+      "observations_per_second": 41.32,
+      "http_requests": 29,
+      "peak_memory_mib": 92.36,
+      "cpu": {
+        "usage_usec": "6183972",
+        "user_usec": "5270761",
+        "system_usec": "913210",
+        "nr_periods": "75",
+        "nr_throttled": "0",
+        "throttled_usec": "0",
+        "nr_bursts": "0",
+        "burst_usec": "0"
+      },
+      "sink_cumulative_counts": {
+        "semantic": 7,
+        "span": 1000,
+        "writeback": 3
+      },
+      "state_bytes": 1213089,
+      "oom_killed": false,
+      "completed_rerun_no_requests": true,
+      "interrupted_and_resumed": true,
+      "overlapping_job_rejected": true
+    }
+  ],
+  "first_retry_gap_seconds": {
+    "GET /case/1000/api/public/v2/observations": 1.023,
+    "POST /v1/traces": 1.017,
+    "GET /case/1000/api/public/v3/scores": 1.009,
+    "POST /sdk/v1/records": 1.146,
+    "POST /case/1000/api/public/scores": 1.029
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "kind": "synthetic-source; actual container and Duckle; real OSS ingestion",
+  "limits": {
+    "cpus": 2,
+    "memory_gib": 1,
+    "source_requests_per_minute": 60000
+  },
+  "image": "sha256:58146178659904f2a6d790169a2e4916a27647a213b6d3fc46ae8d6cf186ee51",
+  "state_storage": "Docker Desktop host bind mount",
+  "faults_triggered": [],
+  "results": [
+    {
+      "observations": 1000,
+      "source_scores": 1000,
+      "wall_seconds": 17.682,
+      "observations_per_second": 56.56,
+      "http_requests": 23,
+      "peak_memory_mib": 91.39,
+      "cpu": {
+        "usage_usec": "10644661",
+        "user_usec": "9134427",
+        "system_usec": "1510233",
+        "nr_periods": "124",
+        "nr_throttled": "0",
+        "throttled_usec": "0",
+        "nr_bursts": "0",
+        "burst_usec": "0"
+      },
+      "sink_cumulative_counts": {
+        "semantic": 7,
+        "span": 1000,
+        "writeback": 3
+      },
+      "state_bytes": 811681,
+      "oom_killed": false,
+      "completed_rerun_no_requests": true,
+      "interrupted_and_resumed": false,
+      "overlapping_job_rejected": false
+    },
+    {
+      "observations": 10000,
+      "source_scores": 10000,
+      "wall_seconds": 75.954,
+      "observations_per_second": 131.66,
+      "http_requests": 131,
+      "peak_memory_mib": 100.53,
+      "cpu": {
+        "usage_usec": "32785468",
+        "user_usec": "27408324",
+        "system_usec": "5377143",
+        "nr_periods": "398",
+        "nr_throttled": "0",
+        "throttled_usec": "0",
+        "nr_bursts": "0",
+        "burst_usec": "0"
+      },
+      "sink_cumulative_counts": {
+        "semantic": 14,
+        "span": 11000,
+        "writeback": 6
+      },
+      "state_bytes": 3515062,
+      "oom_killed": false,
+      "completed_rerun_no_requests": true,
+      "interrupted_and_resumed": false,
+      "overlapping_job_rejected": false
+    }
+  ]
+}

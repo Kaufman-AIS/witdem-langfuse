@@ -1,0 +1,16 @@
+{
+  "real_langfuse_source": true,
+  "real_witdem_receiver": true,
+  "operation_count": 66,
+  "requirement_count": 2,
+  "evaluation_count": 4,
+  "source_score_references_verified": true,
+  "achieved": true,
+  "application_outcome": "approved_with_exceptions",
+  "new_agent_or_judge_calls": 0,
+  "writeback_scores_read_back": 3,
+  "langfuse_version": "4.35.0",
+  "witdem_oss_version": "0.2.11",
+  "import_image": "sha256:cce6751616f66311bf982f9da8fa812aea068a22c38b35ca45877f0d5ad84667",
+  "writeback_image": "sha256:58146178659904f2a6d790169a2e4916a27647a213b6d3fc46ae8d6cf186ee51"
+}

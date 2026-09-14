@@ -11,6 +11,7 @@ import httpx
 
 from .backfill import identity
 from .client import Client
+from .http_policy import request
 
 
 def digest(value):
@@ -141,7 +142,9 @@ def publish(scores, *, base_url, project, public_key, secret_key, allow_http=Fal
         timeout=30,
         follow_redirects=False,
     ) as client:
-        response = client.get(
+        response = request(
+            client,
+            "GET",
             "/api/public/v2/observations",
             params={"traceId": next(iter(trace_ids)), "limit": 1, "fields": "core"},
         )
@@ -154,7 +157,7 @@ def publish(scores, *, base_url, project, public_key, secret_key, allow_http=Fal
             raise ValueError("target project/trace not verified; no scores published")
         acknowledgements = []
         for score in scores:
-            response = client.post("/api/public/scores", json=score)
+            response = request(client, "POST", "/api/public/scores", json=score)
             response.raise_for_status()
             result = response.json()
             if result.get("id") != score["id"]:

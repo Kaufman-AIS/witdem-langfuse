@@ -59,6 +59,12 @@ A real review passed with values 1.0 and 0.9. Clearly labeled synthetic fixtures
 - Resumes interrupted imports with stable identities and reassesses saved evaluations without agent or judge calls.
 - Returns a narrow contract assessment and evidence URL through the existing scores API, excluding those returned scores from its inputs.
 
+## Deploy a headless job
+
+Run a bounded historical job in a Linux container with persistent checkpoints, shared request pacing, resource limits, and structured progress logs. Finished jobs exit; interrupted jobs resume from the same state volume.
+
+[Deployment guide](docs/deployment.md) · [Measured benchmark](docs/benchmark-results.md) · [Reproduce it](benchmarks/README.md)
+
 ## Install and test
 
 Python 3.12+ and uv are required. The connected example additionally requires Langfuse and Witdem OSS; the CUAD runner requires its separately installed application and provider configuration.

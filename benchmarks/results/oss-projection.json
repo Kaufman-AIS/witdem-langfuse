@@ -1,0 +1,20 @@
+[
+  {
+    "observations": 1000,
+    "operation_count": 1000,
+    "requirement_count": 2,
+    "evaluation_count": 4,
+    "achieved": true,
+    "application_outcome": "approved_with_exceptions",
+    "verification_wait_seconds": 132.293
+  },
+  {
+    "observations": 10000,
+    "operation_count": 10000,
+    "requirement_count": 2,
+    "evaluation_count": 4,
+    "achieved": true,
+    "application_outcome": "approved_with_exceptions",
+    "verification_wait_seconds": 161.742
+  }
+]

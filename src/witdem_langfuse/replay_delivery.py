@@ -18,6 +18,7 @@ import httpx
 
 from .backfill import retry_delay
 from .client import Client
+from .http_policy import request
 from .replay import ReplayPage, WireRecord
 
 
@@ -230,7 +231,9 @@ def main():
     with httpx.Client(timeout=30, follow_redirects=False) as http:
 
         def send(body):
-            result = http.post(
+            result = request(
+                http,
+                "POST",
                 args.receiver.rstrip("/") + "/sdk/v1/records",
                 content=body,
                 headers=headers,
