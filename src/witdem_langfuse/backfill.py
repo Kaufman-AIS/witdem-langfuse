@@ -36,7 +36,7 @@ from .client import Client, SourceError
 from .http_policy import request
 from .quota import SharedBudget
 
-NORMALIZATION_VERSION = 2
+NORMALIZATION_VERSION = 3
 
 
 def retry_delay(value, now, failures):
@@ -106,6 +106,43 @@ def token_usage(row):
     return result
 
 
+def model_context(row):
+    """Retain explicit provider/cost facts; never infer provider from model names."""
+    if row.get("type") not in ("GENERATION", "EMBEDDING"):
+        return {}
+    metadata = row.get("metadata")
+    metadata = metadata if isinstance(metadata, dict) else {}
+
+    def observed(key):
+        return metadata.get("attributes." + key, metadata.get(key))
+
+    def amount(value):
+        return type(value) in (int, float) and math.isfinite(value) and value >= 0
+
+    result = {}
+    for key in ("gen_ai.provider.name", "gen_ai.system", "gen_ai.request.model"):
+        value = observed(key)
+        if isinstance(value, str) and 0 < len(value) <= 512:
+            result[key] = value
+    # Original telemetry takes precedence over Langfuse's pricing calculation.
+    cost = observed("gen_ai.cost.usd")
+    if amount(cost):
+        result["gen_ai.cost.usd"] = float(cost)
+        source = observed("gen_ai.cost.source")
+        result["gen_ai.cost.source"] = (
+            source
+            if isinstance(source, str) and 0 < len(source) <= 512
+            else "source_telemetry"
+        )
+    else:
+        details = row.get("costDetails")
+        cost = details.get("total") if isinstance(details, dict) else None
+        if amount(cost):
+            result["gen_ai.cost.usd"] = float(cost)
+            result["gen_ai.cost.source"] = "langfuse_cost_details"
+    return result
+
+
 def encode(rows, project):
     request = ExportTraceServiceRequest()
     resource = request.resource_spans.add()
@@ -147,7 +184,8 @@ def encode(rows, project):
             "witdem.langfuse.import.version": str(NORMALIZATION_VERSION),
         }
         # Explicit opt-in fetch; retain only descriptive workflow identifiers.
-        metadata = row.get("metadata") or {}
+        metadata = row.get("metadata")
+        metadata = metadata if isinstance(metadata, dict) else {}
         for key in (
             "haystack.component.name",
             "haystack.component.type",
@@ -162,12 +200,15 @@ def encode(rows, project):
             attributes["gen_ai.operation.name"] = (
                 "embeddings" if row["type"] == "EMBEDDING" else "chat"
             )
+        attributes.update(model_context(row))
         for target, value in token_usage(row).items():
             attributes["gen_ai.usage." + target] = value
         for key, value in attributes.items():
             item = span.attributes.add(key=key)
             if type(value) is int:
                 item.value.int_value = value
+            elif type(value) is float:
+                item.value.double_value = value
             else:
                 item.value.string_value = str(value)
     return request.SerializeToString(deterministic=True)
@@ -257,11 +298,13 @@ class Backfill:
         clock=time.time,
         budget=None,
         workflow_context=False,
+        telemetry_context=False,
     ):
         a, b = (datetime.fromisoformat(v) for v in (start, end))
         if a.tzinfo is None or b.tzinfo is None or a >= b or not 1 <= page_size <= 1000:
             raise ValueError("invalid backfill range or page size")
         self.workflow_context = workflow_context
+        self.telemetry_context = telemetry_context
         self.client, self.send = client, send
         self.transform = transform
         self.clock = clock
@@ -277,6 +320,9 @@ class Backfill:
             "end": b.astimezone(UTC).isoformat(),
             "page_size": page_size,
         }
+
+        if telemetry_context:
+            self.config["telemetry_context"] = 1
 
         if workflow_context:
             self.config["workflow_context"] = 1
@@ -357,7 +403,11 @@ class Backfill:
                                 cursor=state["cursor"],
                                 limit=self.config["page_size"],
                                 fields="core,basic,time,usage,model"
-                                + (",metadata" if self.workflow_context else ""),
+                                + (
+                                    ",metadata"
+                                    if self.workflow_context or self.telemetry_context
+                                    else ""
+                                ),
                             )
                         except SourceError as exc:
                             if (
@@ -448,6 +498,11 @@ def main():
     parser.add_argument("--page-size", type=int, default=100)
     parser.add_argument("--allow-http", action="store_true")
     parser.add_argument(
+        "--telemetry-context",
+        action="store_true",
+        help="fetch metadata to retain only explicit provider, request model, and cost attributes",
+    )
+    parser.add_argument(
         "--quota-db",
         type=Path,
         default=Path.home() / ".local/state/witdem-langfuse/quota.sqlite",
@@ -500,6 +555,7 @@ def main():
             args.to_time,
             send=send,
             page_size=args.page_size,
+            telemetry_context=args.telemetry_context,
             budget=None
             if os.getenv("WITDEM_JOB_STATE")
             else SharedBudget(

@@ -117,6 +117,27 @@ snapshot and makes no source requests. Omit `--receiver` for wholly offline
 reassessment. Each workspace is immutable: changed source data or configuration
 requires a new workspace. Assessment-version comparisons are outside this demo.
 
+To verify a fresh live import without creating synthetic fixtures, place the
+runner output in `output/live-usage/live` and run:
+
+```sh
+.venv/bin/python examples/cuad-evaluations/verify.py \
+  --output output/live-usage --dashboard http://127.0.0.1:28512 --live-only
+```
+
+The verifier compares model calls, input/output/total tokens, providers, models,
+reported cost, and cost coverage against the original application execution,
+alongside the requirement and evidence checks. Witdem OSS performs normalization
+and cost presentation using its existing adapters; the integration only restores
+source telemetry attributes that were previously dropped.
+
+Fresh provider run verified on 2026-09-14 with Duckle 0.7.2 and unchanged OSS 0.2.11:
+19 model calls, 14,386 tokens, DeepSeek/Mistral/OpenAI/Voyage, and $0.04169092
+reported cost. Cost coverage was 18/19 calls; the unmeasured call remains unknown.
+Original trace: `edb4b038b31d4116928a8f9c8ed45549`; imported execution:
+`910e41ecd8353136a8fb9d3bc0ba4b6e`. Both declared requirements passed. This fresh
+run called the providers; importing and reassessing it made no additional AI calls.
+
 ## Failed and missing fixtures
 
 These are deliberately synthetic saved evaluations, not real failed model runs.
@@ -165,10 +186,13 @@ reason. The goal-flow heading uses the application workflow name, “Contract
 review”; the narrower declared goal is retained in contract metadata and the
 execution-list goal filter. No UI changes were made to alter these labels.
 
-The demo opts into fetching observation metadata to retain only three workflow
-identifiers: `haystack.component.name`, `haystack.component.type`, and
+The demo opts into fetching observation metadata to retain explicit provider, request-model, and reported-cost
+attributes alongside three workflow identifiers: `haystack.component.name`, `haystack.component.type`, and
 `witdem.workflow.id`. Arbitrary metadata and input/output are not forwarded.
-The default generic trace backfill remains metadata-free.
+The default generic trace backfill remains metadata-free; use `--telemetry-context`
+to retain source provider/cost metadata. The example enables this metadata fetch.
+Synthetic fixtures contain no model calls and therefore have no cost or token usage.
+Use the real execution to inspect those measurements.
 
 This is a bounded, operator-run integration. It does not implement automatic
 scheduling, distributed quotas, a new UI, new evaluators, or an immutable external
