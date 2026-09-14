@@ -70,8 +70,14 @@ For Duckle or SDK changes, also run the existing container recovery check:
 Use a fresh output directory each time. Image updates affecting Witdem or Langfuse
 need the connected example checks as well. Update compatibility notes only after
 verification; retain the original version labels on historical benchmark results.
-These are maintainer checks, not an assertion that GitHub CI or branch protection
-has been configured.
+The [CI workflow](../.github/workflows/ci.yml) runs lint, formatting, tests, lockfile
+consistency, and the synthetic container recovery check on pull requests and main.
+Live-service example verification remains a maintainer check. Main requires both
+`Python checks` and `Container recovery` to pass against an up-to-date branch,
+and changes must go through a pull request. Direct pushes, force pushes, and
+branch deletion are blocked, including for administrators. No approving review
+is required, so a solo maintainer can merge after checks and conversations are
+resolved.
 
 Validate edits to Renovate's configuration before merging:
 
