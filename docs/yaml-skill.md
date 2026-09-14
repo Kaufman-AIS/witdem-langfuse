@@ -12,7 +12,8 @@ evidence. It reuses this integration's validators and the existing Witdem schema
 Ask your coding assistant:
 
 > Read skills/witdem-langfuse-yaml/SKILL.md and use it to help me create a contract
-> and score bindings for my Langfuse workflow. Ask me for missing targets or source
+> and score bindings for my application workflow using its existing evaluations in
+> Langfuse. Ask me for missing targets or source
 > identities, then validate both YAML files locally.
 
 Provide the goal, requirement targets, evaluation names and actual source
