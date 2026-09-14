@@ -19,7 +19,6 @@ receiver/dashboard. Install from the `witdem-langfuse` repository:
 ```sh
 uv venv .venv --python 3.12
 uv pip install --python .venv/bin/python -e '.[etl,telemetry,contracts]'
-export DUCKLE_EXECUTABLE="$PWD/.venv/bin/duckle"
 ```
 
 Supply `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_BASE_URL`,

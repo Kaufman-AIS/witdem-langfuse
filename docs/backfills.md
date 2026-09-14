@@ -13,7 +13,6 @@ Install and run from this repository:
 
 ```sh
 uv pip install --python .venv/bin/python -e '.[etl,telemetry]'
-export DUCKLE_EXECUTABLE="$PWD/.venv/bin/duckle"
 # Supply LANGFUSE_PUBLIC_KEY, LANGFUSE_SECRET_KEY, and optional WITDEM_API_KEY
 # through your environment or secret manager.
 .venv/bin/witdem-langfuse-backfill \

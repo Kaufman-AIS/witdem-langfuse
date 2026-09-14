@@ -38,7 +38,7 @@ jobs:
           .venv/bin/ruff check src tests benchmarks skills
           .venv/bin/ruff format --check src tests benchmarks skills
       - name: Run tests with Duckle
-        run: DUCKLE_EXECUTABLE="$PWD/.venv/bin/duckle" .venv/bin/python -m unittest discover -s tests -q
+        run: .venv/bin/python -m unittest discover -s tests -q
 
   container:
     name: Container recovery

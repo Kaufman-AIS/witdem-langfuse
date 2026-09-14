@@ -5,7 +5,6 @@ import fcntl
 import hashlib
 import json
 import os
-import shutil
 import sqlite3
 import subprocess
 import sys
@@ -20,6 +19,7 @@ from .backfill import retry_delay
 from .client import Client
 from .http_policy import request
 from .replay import ReplayPage, WireRecord
+from .runtime import backfill_executable
 
 
 def canonical(value):
@@ -32,9 +32,7 @@ def duckle_page(page, *, pipeline_name="replay.pipeline.json", validate_page=Tru
     encoded = canonical({"page_json": canonical(page)}) + "\n"
     if len(encoded.encode()) > 32 * 1024 * 1024:
         raise ValueError("Duckle replay page exceeds 32 MiB")
-    executable = os.environ.get("DUCKLE_EXECUTABLE") or shutil.which("duckle")
-    if not executable:
-        raise RuntimeError("Duckle is required for application record replay")
+    executable = backfill_executable()
     with tempfile.TemporaryDirectory(prefix="witdem-replay-") as directory:
         root = Path(directory)
         (root / "input.jsonl").write_text(encoded)
