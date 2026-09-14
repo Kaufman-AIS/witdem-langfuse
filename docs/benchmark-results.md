@@ -108,3 +108,24 @@ large individual score payloads, distributed workers, or concurrent jobs.
 The next deployment step is one Linux host using the documented container and
 persistent volume, with request limits set for the actual services. Horizontal
 scaling and recurring scheduling are outside this implementation.
+
+## Duckle 0.7.2 upgrade verification
+
+Upgraded the integration pin and deployment lockfile to
+[Duckle 0.7.2](https://pypi.org/project/duckle/0.7.2/) on 14 September 2026.
+All 39 tests passed. The Linux image completed a synthetic 10,000-observation /
+10,000-score import, assessment, and writeback in **32.8 seconds**, with **98.2 MiB**
+peak import/assessment memory and the exact expected record counts.
+
+The 1,000-observation fault case passed 429/503 recovery, lost acknowledgements,
+hard-kill resume, competing-owner rejection, and completed-job no-op checks.
+A saved, delivered assessment created under 0.5.11 was reassessed under 0.7.2
+with container networking disabled: both requirements still passed and all seven
+delivery receipts remained acknowledged. No pipeline changes were needed.
+
+[Upgrade load check](../benchmarks/results/duckle-0.7.2-baseline.json) ·
+[Upgrade fault check](../benchmarks/results/duckle-0.7.2-faults.json)
+
+The chart and 100,000-row measurements above remain historical 0.5.11 results;
+they have not been relabeled as 0.7.2 performance. This upgrade check uses the
+synthetic endpoints, not a repeated live Langfuse/Witdem deployment test.

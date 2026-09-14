@@ -82,7 +82,7 @@ export DUCKLE_EXECUTABLE="$PWD/.venv/bin/duckle"
 
 ## Status and limits
 
-Verified locally with Langfuse 4.35.0, Witdem OSS 0.2.11, Witdem SDK 0.2.3, and Duckle 0.5.11. This is an operator-triggered alpha, not a production compatibility guarantee. No automatic scheduling, new evaluators, dashboards, or contract-version comparisons are included.
+Duckle is pinned to 0.7.2; see the [upgrade verification](docs/benchmark-results.md#duckle-072-upgrade-verification). The original live example used Langfuse 4.35.0, Witdem OSS 0.2.11, Witdem SDK 0.2.3, and Duckle 0.5.11. The large-volume benchmark also used 0.5.11. This is an operator-triggered alpha, not a production compatibility guarantee. No automatic scheduling, new evaluators, dashboards, or contract-version comparisons are included.
 
 The existing UI's unknown-result labels and narrower-goal presentation limitations are documented in the example. Evidence links require destination access. Private runtime data, credentials, and local recordings are excluded; the verifier generates a terminal walkthrough from your own run. No Langfuse endorsement is implied.
 

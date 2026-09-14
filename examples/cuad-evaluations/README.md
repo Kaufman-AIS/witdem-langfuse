@@ -147,7 +147,7 @@ Witdem evidence export URL. Readers still need their own destination access.
 
 ## Verified locally, 2026-09-14
 
-- Langfuse 4.35.0; unmodified Witdem OSS 0.2.11; SDK 0.2.3; Duckle 0.5.11.
+- Original run versions: Langfuse 4.35.0; unmodified Witdem OSS 0.2.11; SDK 0.2.3; Duckle 0.5.11.
 - Real CUAD: evidence completeness 1.0; extraction confidence 0.9; requirements met.
 - Application disposition retained as `approved_with_exceptions`.
 - Historical trace: 66 operations, 19 model calls, 15,998 tokens retained.

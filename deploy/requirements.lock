@@ -13,7 +13,7 @@ charset-normalizer==3.5.1
     # via requests
 duckdb-cli==1.5.4
     # via duckle
-duckle==0.5.11
+duckle==0.7.2
     # via witdem-langfuse (pyproject.toml)
 googleapis-common-protos==1.75.3
     # via opentelemetry-exporter-otlp-proto-http

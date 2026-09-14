@@ -34,7 +34,7 @@ docker compose -f deploy/compose.yaml up --abort-on-container-exit --exit-code-f
 The container runs as UID 10001, with two CPUs, 1 GiB memory, and 128 processes.
 It exposes no ports. `/config` is read-only; `/state` is persistent. Temporary
 Duckle files use the container's disposable disk. The image installs a locked
-Python dependency set and retains the tested Duckle 0.5.11 version.
+Python dependency set and pins Duckle 0.7.2.
 
 Only point it at endpoints reachable from the container. For a local Docker
 Desktop demo, `host.docker.internal` reaches host-published ports; append
@@ -102,8 +102,9 @@ This deployment is single-host. Do not horizontally replicate it over NFS and
 assume SQLite/OS locks form a distributed job coordinator. Scheduling and
 multi-machine partition ownership remain outside this release.
 
-Duckle's newer releases also offer [headless/server deployment](https://duckle.org/docs/automation.html)
+Duckle also offers [headless/server deployment](https://duckle.org/docs/automation.html)
 and [batch workers](https://duckle.org/deploy.html). This adapter uses its own
 Python coordinator for API pagination and delivery receipts, so running a pipeline
-JSON alone does not run the complete integration. We retain the tested dependency
-rather than assuming newer server features provide compatibility automatically.
+JSON alone does not run the complete integration. The integration pins 0.7.2
+and continues to use its existing pipeline runner;
+this upgrade does not switch to Duckle server or distributed batch workers.

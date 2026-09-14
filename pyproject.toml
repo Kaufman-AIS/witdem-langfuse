@@ -17,7 +17,7 @@ Issues = "https://github.com/Kaufman-AIS/witdem-langfuse/issues"
 
 [project.optional-dependencies]
 dev = ["httpx2>=2.12,<3", "ruff>=0.15,<1"]
-etl = ["duckle==0.5.11"]
+etl = ["duckle==0.7.2"]
 contracts = ["witdem-sdk==0.2.3", "PyYAML>=6,<7"]
 telemetry = ["opentelemetry-sdk>=1.39,<2", "opentelemetry-exporter-otlp-proto-http>=1.39,<2"]
 

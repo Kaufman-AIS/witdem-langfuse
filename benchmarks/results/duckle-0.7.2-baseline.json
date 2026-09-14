@@ -1,0 +1,42 @@
+{
+  "kind": "synthetic-source; actual container and Duckle; SQLite identity-verifying sink",
+  "limits": {
+    "cpus": 2,
+    "memory_gib": 1,
+    "source_requests_per_minute": 60000
+  },
+  "image": "sha256:cb45035307827ba2751d97848340cdc26638174ab9fb99dc50fa3ef8f212c4a9",
+  "state_storage": "Docker Desktop host bind mount",
+  "faults_triggered": [],
+  "results": [
+    {
+      "observations": 10000,
+      "source_scores": 10000,
+      "wall_seconds": 32.842,
+      "observations_per_second": 304.48,
+      "http_requests": 131,
+      "peak_memory_mib": 98.22,
+      "cpu": {
+        "usage_usec": "25181085",
+        "user_usec": "21014635",
+        "system_usec": "4166450",
+        "nr_periods": "288",
+        "nr_throttled": "0",
+        "throttled_usec": "0",
+        "nr_bursts": "0",
+        "burst_usec": "0"
+      },
+      "sink_cumulative_counts": {
+        "semantic": 7,
+        "span": 10000,
+        "writeback": 3
+      },
+      "state_bytes": 3515062,
+      "oom_killed": false,
+      "completed_rerun_no_requests": true,
+      "interrupted_and_resumed": false,
+      "overlapping_job_rejected": false
+    }
+  ],
+  "duckle_version": "0.7.2"
+}

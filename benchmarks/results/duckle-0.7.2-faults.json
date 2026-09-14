@@ -1,0 +1,49 @@
+{
+  "kind": "synthetic-source; actual container and Duckle; SQLite identity-verifying sink",
+  "limits": {
+    "cpus": 2,
+    "memory_gib": 1,
+    "source_requests_per_minute": 60000
+  },
+  "image": "sha256:cb45035307827ba2751d97848340cdc26638174ab9fb99dc50fa3ef8f212c4a9",
+  "state_storage": "Linux named volume",
+  "faults_triggered": [
+    "ack_loss",
+    "get429-observations",
+    "get429-scores",
+    "post503-records",
+    "post503-scores",
+    "post503-traces"
+  ],
+  "results": [
+    {
+      "observations": 1000,
+      "source_scores": 1000,
+      "wall_seconds": 21.106,
+      "observations_per_second": 47.38,
+      "http_requests": 29,
+      "peak_memory_mib": 94.75,
+      "cpu": {
+        "usage_usec": "5399709",
+        "user_usec": "4756552",
+        "system_usec": "643156",
+        "nr_periods": "65",
+        "nr_throttled": "0",
+        "throttled_usec": "0",
+        "nr_bursts": "0",
+        "burst_usec": "0"
+      },
+      "sink_cumulative_counts": {
+        "semantic": 7,
+        "span": 1000,
+        "writeback": 3
+      },
+      "state_bytes": 1213089,
+      "oom_killed": false,
+      "completed_rerun_no_requests": true,
+      "interrupted_and_resumed": true,
+      "overlapping_job_rejected": true
+    }
+  ],
+  "duckle_version": "0.7.2"
+}
