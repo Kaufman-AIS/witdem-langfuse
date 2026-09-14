@@ -108,8 +108,6 @@ def token_usage(row):
 
 def model_context(row):
     """Retain explicit provider/cost facts; never infer provider from model names."""
-    if row.get("type") not in ("GENERATION", "EMBEDDING"):
-        return {}
     metadata = row.get("metadata")
     metadata = metadata if isinstance(metadata, dict) else {}
 
@@ -124,6 +122,8 @@ def model_context(row):
         value = observed(key)
         if isinstance(value, str) and 0 < len(value) <= 512:
             result[key] = value
+    if row.get("type") not in ("GENERATION", "EMBEDDING"):
+        return result
     # Original telemetry takes precedence over Langfuse's pricing calculation.
     cost = observed("gen_ai.cost.usd")
     if amount(cost):

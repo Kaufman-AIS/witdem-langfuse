@@ -54,7 +54,9 @@ class BackfillTest(unittest.TestCase):
         self.assertEqual(attrs["gen_ai.cost.usd"].double_value, 0.004)
         self.assertEqual(attrs["gen_ai.cost.source"].string_value, "litellm_reported")
         self.assertNotIn("private", attrs)
-        self.assertEqual(model_context(dict(row, type="SPAN")), {})
+        context = model_context(dict(row, type="SPAN"))
+        self.assertEqual(context["gen_ai.provider.name"], "deepseek")
+        self.assertNotIn("gen_ai.cost.usd", context)
 
     def test_missing_cost_is_not_zero_or_inferred(self):
         self.assertEqual(model_context(dict(ROW, totalCost=0, costDetails={})), {})
