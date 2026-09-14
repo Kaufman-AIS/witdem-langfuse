@@ -10,6 +10,41 @@ This repository is the Langfuse integration for [Witdem](https://witdem.com/en),
 
 The integration is currently experimental: Langfuse supplies traces and evaluations; Witdem YAML contracts give those evaluations requirement names, targets, and failure explanations. Results appear in the existing Witdem OSS application, with source references in exported evidence. Neither application's source code or UI needs to change.
 
+## See the integration
+
+**Existing evaluations → named requirements → a reviewable outcome.**
+
+![Real CUAD execution: existing evaluation scores and the named requirements they satisfy, in Witdem OSS](docs/assets/screenshots/requirements-met.png)
+
+*Real Haystack CUAD execution, displayed in existing Witdem OSS. Evidence completeness
+is 1.0 and extraction confidence is 0.9; both declared requirements pass.
+“Achieved” refers to these evidence-quality checks, not legal approval.*
+
+<details>
+<summary><strong>Explore the execution overview</strong></summary>
+
+![Execution overview: application disposition, path coverage, recovered step, and step timings](docs/assets/screenshots/execution-overview.png)
+
+The same real execution, with application disposition, path coverage, step timing,
+and a recovered step. Coverage measures the declared workflow paths reached; it
+is not an evaluation score.
+
+</details>
+
+<details>
+<summary><strong>See an unmet requirement — synthetic fixture</strong></summary>
+
+![Synthetic fixture: evidence completeness of 0.6 fails the requirement and shows the explanation Supporting evidence is below 80 percent](docs/assets/screenshots/requirement-failed-fixture.png)
+
+**Synthetic failed-threshold fixture.** Evidence completeness is 0.6 against a 0.8
+target. The requirement needs attention while the separately reported application
+disposition remains “Approved with exceptions.” The copied workflow diagram is
+context for this fixture, not an actual agent execution.
+
+</details>
+
+[Run this example](examples/cuad-evaluations/README.md) · [Screenshot details](docs/screenshots.md)
+
 ## How it works
 
 Langfuse remains the source of traces and evaluations. The integration reads those existing evaluations, applies the requirements your team declared, and delivers the assessment to Witdem OSS.
