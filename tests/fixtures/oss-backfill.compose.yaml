@@ -1,0 +1,23 @@
+name: witdem-backfill-acceptance
+services:
+  receiver:
+    image: ghcr.io/ebrahimisoheil/witdem-analytics:0.2.11
+    command: [witdem, serve, --host, 0.0.0.0, --port, '4318', --db, /app/data/live.duckdb]
+    ports: ['127.0.0.1:24329:4318']
+    environment: &environment
+      WITDEM_DATA_DIR: /app/data
+      WITDEM_DB_PATH: /app/data/live.duckdb
+    volumes: ['data:/app/data']
+  worker:
+    image: ghcr.io/ebrahimisoheil/witdem-analytics:0.2.11
+    command: [witdem, elt, worker, --poll-interval, '0.25']
+    environment: *environment
+    volumes: ['data:/app/data']
+  dashboard:
+    image: ghcr.io/ebrahimisoheil/witdem-analytics:0.2.11
+    command: [witdem, dashboard, --db, /app/data/live.duckdb, --dashboard-host, 0.0.0.0, --dashboard-port, '8501']
+    ports: ['127.0.0.1:28512:8501']
+    environment: *environment
+    volumes: ['data:/app/data']
+volumes:
+  data:

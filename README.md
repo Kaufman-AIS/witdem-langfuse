@@ -1,0 +1,59 @@
+# Witdem for Langfuse
+
+Understand whether an AI execution met your declared requirements, using the evaluations you already store in Langfuse.
+
+A small, experimental integration: Langfuse supplies traces and evaluations; Witdem YAML contracts give those evaluations requirement names, targets, and failure explanations. Results appear in the existing Witdem OSS application, with source references in exported evidence. Neither application's source code or UI needs to change.
+
+```mermaid
+flowchart LR
+  LF[Langfuse traces and evaluations] --> D[Duckle backfill]
+  YAML[Witdem contract and score bindings] --> A[Requirement assessment]
+  D --> A
+  A --> W[Existing Witdem OSS]
+  W -->|Assessment scores and evidence URL| LF
+```
+
+## Example: CUAD contract review
+
+Goal: **Review meets the declared evidence-quality requirements.**
+
+| Requirement | Existing evaluation | Target |
+| --- | --- | --- |
+| Findings have sufficient supporting evidence | Evidence completeness | ≥ 0.80 |
+| Extraction meets the declared confidence target | Extraction confidence | ≥ 0.70 |
+
+A real review passed with values 1.0 and 0.9. Clearly labeled synthetic fixtures demonstrate a failed threshold and missing evaluation. Application approval, rejection, or escalation stays separate: meeting these checks does not establish legal approval or overall business success.
+
+**[Run the example](examples/cuad-evaluations/README.md)** · [YAML contract](examples/cuad-evaluations/contract.yaml) · [Integration proposal](docs/upstream.md)
+
+## What the adapter does
+
+- Imports bounded historical traces and scores through public Langfuse APIs and Duckle.
+- Binds scores by configured identity, source, and trace/observation scope.
+- Applies Boolean checks and numeric thresholds; missing or ambiguous evidence remains unknown.
+- Preserves score IDs, values, comments, subjects, and original trace references.
+- Resumes interrupted imports with stable identities and reassesses saved evaluations without agent or judge calls.
+- Returns a narrow contract assessment and evidence URL through the existing scores API, excluding those returned scores from its inputs.
+
+## Install and test
+
+Python 3.12+ and uv are required. The connected example additionally requires Langfuse and Witdem OSS; the CUAD runner requires its separately installed application and provider configuration.
+
+```sh
+git clone https://github.com/Kaufman-AIS/witdem-langfuse.git
+cd witdem-langfuse
+uv venv .venv --python 3.12
+uv pip install --python .venv/bin/python -e '.[etl,telemetry,contracts,dev]'
+export DUCKLE_EXECUTABLE="$PWD/.venv/bin/duckle"
+.venv/bin/python -m unittest discover -s tests -q
+```
+
+[Backfill reference](docs/backfills.md) · [Explicit record replay](docs/business-record-replay.md) · [Score writeback](docs/score-writeback.md)
+
+## Status and limits
+
+Verified locally with Langfuse 4.35.0, Witdem OSS 0.2.11, Witdem SDK 0.2.3, and Duckle 0.5.11. This is an operator-triggered alpha, not a production compatibility guarantee. No automatic scheduling, new evaluators, dashboards, or contract-version comparisons are included.
+
+The existing UI's unknown-result labels and narrower-goal presentation limitations are documented in the example. Evidence links require destination access. Private runtime data, credentials, and local recordings are excluded; the verifier generates a terminal walkthrough from your own run. No Langfuse endorsement is implied.
+
+Licensed under [Apache-2.0](LICENSE).

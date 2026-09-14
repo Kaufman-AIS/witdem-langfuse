@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "witdem-langfuse"
+version = "0.1.0a1"
+description = "Business outcomes and evidence alongside Langfuse"
+requires-python = ">=3.12"
+dependencies = ["pydantic>=2.10,<3", "httpx>=0.28,<1"]
+
+[project.optional-dependencies]
+dev = ["httpx2>=2.12,<3", "ruff>=0.15,<1"]
+etl = ["duckle==0.5.11"]
+contracts = ["witdem-sdk==0.2.3", "PyYAML>=6,<7"]
+telemetry = ["opentelemetry-sdk>=1.39,<2", "opentelemetry-exporter-otlp-proto-http>=1.39,<2"]
+
+[project.scripts]
+witdem-langfuse-backfill = "witdem_langfuse.backfill:main"
+witdem-langfuse-replay = "witdem_langfuse.replay_delivery:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+witdem_langfuse = ["pipelines/*.json"]

@@ -1,0 +1,74 @@
+{
+  "name": "Langfuse historical observation normalization",
+  "nodes": [
+    {
+      "id": "facts",
+      "type": "source",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "data": {
+        "label": "facts",
+        "componentId": "src.jsonl",
+        "properties": {
+          "path": "${workspace}/input.jsonl"
+        }
+      }
+    },
+    {
+      "id": "evaluate",
+      "type": "custom",
+      "position": {
+        "x": 280,
+        "y": 0
+      },
+      "data": {
+        "label": "evaluate",
+        "componentId": "code.python",
+        "properties": {
+          "code": "from witdem_langfuse.backfill import process"
+        }
+      }
+    },
+    {
+      "id": "assessments",
+      "type": "sink",
+      "position": {
+        "x": 560,
+        "y": 0
+      },
+      "data": {
+        "label": "assessments",
+        "componentId": "snk.jsonl",
+        "properties": {
+          "path": "${workspace}/output.jsonl",
+          "mode": "overwrite",
+          "format": "jsonl"
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "facts_evaluate",
+      "source": "facts",
+      "target": "evaluate",
+      "sourceHandle": "main",
+      "targetHandle": "main",
+      "data": {
+        "connectionType": "main"
+      }
+    },
+    {
+      "id": "evaluate_assessments",
+      "source": "evaluate",
+      "target": "assessments",
+      "sourceHandle": "main",
+      "targetHandle": "main",
+      "data": {
+        "connectionType": "main"
+      }
+    }
+  ]
+}

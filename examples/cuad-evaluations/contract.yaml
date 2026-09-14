@@ -1,0 +1,55 @@
+version: 2
+id: cuad_evidence_quality
+name: CUAD evidence quality
+description: Assessment of existing Langfuse evaluations. This does not establish
+  legal approval.
+result:
+  name: Contract review result
+  description: The structured review returned by the Haystack workflow.
+  values:
+    approved:
+      description: Approved without exceptions.
+      tone: success
+    approved_with_exceptions:
+      description: Approved with documented exceptions.
+      tone: warning
+    manual_review_required:
+      description: Escalated for human review.
+      tone: warning
+    rejected_by_playbook:
+      description: Rejected by the fictional playbook.
+      tone: failure
+    processing_failed:
+      description: The workflow did not complete the review.
+      tone: failure
+goal:
+  name: Review meets the declared evidence-quality requirements
+  description: Check evidence completeness and extraction confidence using existing
+    evaluations.
+  requirements:
+    evidence_supported:
+      name: Findings have sufficient supporting evidence
+      description: Evidence completeness must be at least 80%.
+      failure:
+        label: Supporting evidence is below 80%
+        description: Inspect the evidence completeness evaluation and its source execution.
+    extraction_trusted:
+      name: Extraction meets the declared confidence target
+      description: Extraction confidence must be at least 70%.
+      failure:
+        label: Extraction confidence is below 70%
+        description: Inspect extraction confidence and the original document processing
+          trace.
+evaluations:
+  evidence_completeness:
+    name: Evidence completeness
+    description: Share of evidence-bearing result items with page and source text.
+    target: 0.8
+    direction: higher_is_better
+    unit: ratio
+  extraction_confidence:
+    name: Extraction confidence
+    description: Confidence assigned to the document extraction stage.
+    target: 0.7
+    direction: higher_is_better
+    unit: ratio
