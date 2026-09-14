@@ -80,6 +80,10 @@ export DUCKLE_EXECUTABLE="$PWD/.venv/bin/duckle"
 
 [Backfill reference](docs/backfills.md) · [Explicit record replay](docs/business-record-replay.md) · [Score writeback](docs/score-writeback.md)
 
+## Dependency maintenance
+
+[Renovate configuration](renovate.json) proposes reviewed Python and container updates, including lockfile refreshes. See [activation and maintenance instructions](docs/dependency-updates.md).
+
 ## Status and limits
 
 Duckle is pinned to 0.7.2; see the [upgrade verification](docs/benchmark-results.md#duckle-072-upgrade-verification). The original live example used Langfuse 4.35.0, Witdem OSS 0.2.11, Witdem SDK 0.2.3, and Duckle 0.5.11. The large-volume benchmark also used 0.5.11. This is an operator-triggered alpha, not a production compatibility guarantee. No automatic scheduling, new evaluators, dashboards, or contract-version comparisons are included.

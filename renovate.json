@@ -1,0 +1,61 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended"
+  ],
+  "enabledManagers": [
+    "pip-compile",
+    "dockerfile",
+    "docker-compose",
+    "github-actions"
+  ],
+  "timezone": "Europe/Berlin",
+  "schedule": [
+    "before 6am on monday"
+  ],
+  "prConcurrentLimit": 3,
+  "prHourlyLimit": 2,
+  "automerge": false,
+  "constraints": {
+    "python": "==3.12.*"
+  },
+  "pip-compile": {
+    "managerFilePatterns": [
+      "/^deploy/requirements\\.lock$/"
+    ]
+  },
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "before 6am on monday"
+    ]
+  },
+  "packageRules": [
+    {
+      "description": "Group routine Python updates; review core integration dependencies separately.",
+      "matchManagers": [
+        "pip-compile"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "matchPackageNames": [
+        "!duckle",
+        "!witdem-sdk"
+      ],
+      "groupName": "Python dependencies (non-major)"
+    }
+  ],
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/.venv/**",
+    "output/**",
+    "research/**"
+  ],
+  "docker-compose": {
+    "managerFilePatterns": [
+      "/(^|/)[^/]*compose\\.ya?ml$/"
+    ]
+  }
+}

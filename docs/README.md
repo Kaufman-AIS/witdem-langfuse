@@ -26,6 +26,7 @@ The contract uses Witdem's existing schema. The score-binding YAML is owned by t
 | Guide | What it covers |
 | --- | --- |
 | [CUAD example](../examples/cuad-evaluations/README.md) | Setup, YAML binding, three demonstration cases, offline reassessment, and known UI limits |
+| [Dependency updates](dependency-updates.md) | Renovate activation, update policy, lockfile handling, and maintainer verification |
 | [Headless deployment](deployment.md) | Container setup, durable job state, request pacing, resource limits, and restart behavior |
 | [Benchmark results](benchmark-results.md) | Measured capacity, fault recovery, real-service verification, and limits |
 | [Benchmark harness](../benchmarks/README.md) | Synthetic workloads, fault injection, real OSS verification, and measurement definitions |
